@@ -1,0 +1,364 @@
+{
+  "repo": "demo",
+  "nodes": [
+    {
+      "id": "src",
+      "type": "folder"
+    },
+    {
+      "id": "src/demo",
+      "type": "folder",
+      "parent": "src"
+    },
+    {
+      "id": "src/demo/core",
+      "type": "folder",
+      "parent": "src/demo"
+    },
+    {
+      "id": "src/demo/web",
+      "type": "folder",
+      "parent": "src/demo"
+    },
+    {
+      "id": "src/demo/utils",
+      "type": "folder",
+      "parent": "src/demo"
+    },
+    {
+      "id": "src/demo/__init__.py",
+      "type": "file",
+      "parent": "src/demo",
+      "lines": 12,
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "src/demo/app.py",
+      "type": "file",
+      "parent": "src/demo",
+      "lines": 420,
+      "classes": [
+        "App"
+      ],
+      "functions": [
+        "create_app"
+      ]
+    },
+    {
+      "id": "src/demo/config.py",
+      "type": "file",
+      "parent": "src/demo",
+      "lines": 130,
+      "classes": [
+        "Config"
+      ],
+      "functions": [
+        "load_config"
+      ]
+    },
+    {
+      "id": "src/demo/cli.py",
+      "type": "file",
+      "parent": "src/demo",
+      "lines": 95,
+      "classes": [],
+      "functions": [
+        "main",
+        "run"
+      ]
+    },
+    {
+      "id": "src/demo/core/__init__.py",
+      "type": "file",
+      "parent": "src/demo/core",
+      "lines": 8,
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "src/demo/core/engine.py",
+      "type": "file",
+      "parent": "src/demo/core",
+      "lines": 610,
+      "classes": [
+        "Engine"
+      ],
+      "functions": [
+        "start",
+        "stop"
+      ]
+    },
+    {
+      "id": "src/demo/core/scheduler.py",
+      "type": "file",
+      "parent": "src/demo/core",
+      "lines": 240,
+      "classes": [
+        "Scheduler"
+      ],
+      "functions": [
+        "schedule"
+      ]
+    },
+    {
+      "id": "src/demo/core/models.py",
+      "type": "file",
+      "parent": "src/demo/core",
+      "lines": 310,
+      "classes": [
+        "User",
+        "Task"
+      ],
+      "functions": []
+    },
+    {
+      "id": "src/demo/core/db.py",
+      "type": "file",
+      "parent": "src/demo/core",
+      "lines": 180,
+      "classes": [
+        "Session"
+      ],
+      "functions": [
+        "connect"
+      ]
+    },
+    {
+      "id": "src/demo/core/signals.py",
+      "type": "file",
+      "parent": "src/demo/core",
+      "lines": 60,
+      "classes": [],
+      "functions": [
+        "emit",
+        "listen"
+      ]
+    },
+    {
+      "id": "src/demo/web/__init__.py",
+      "type": "file",
+      "parent": "src/demo/web",
+      "lines": 6,
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "src/demo/web/routes.py",
+      "type": "file",
+      "parent": "src/demo/web",
+      "lines": 350,
+      "classes": [],
+      "functions": [
+        "index",
+        "login",
+        "logout"
+      ]
+    },
+    {
+      "id": "src/demo/web/views.py",
+      "type": "file",
+      "parent": "src/demo/web",
+      "lines": 280,
+      "classes": [
+        "View"
+      ],
+      "functions": [
+        "render"
+      ]
+    },
+    {
+      "id": "src/demo/web/forms.py",
+      "type": "file",
+      "parent": "src/demo/web",
+      "lines": 150,
+      "classes": [
+        "LoginForm"
+      ],
+      "functions": []
+    },
+    {
+      "id": "src/demo/web/templating.py",
+      "type": "file",
+      "parent": "src/demo/web",
+      "lines": 120,
+      "classes": [],
+      "functions": [
+        "render_template"
+      ]
+    },
+    {
+      "id": "src/demo/utils/__init__.py",
+      "type": "file",
+      "parent": "src/demo/utils",
+      "lines": 4,
+      "classes": [],
+      "functions": []
+    },
+    {
+      "id": "src/demo/utils/helpers.py",
+      "type": "file",
+      "parent": "src/demo/utils",
+      "lines": 90,
+      "classes": [],
+      "functions": [
+        "slugify",
+        "chunk"
+      ]
+    },
+    {
+      "id": "src/demo/utils/logging.py",
+      "type": "file",
+      "parent": "src/demo/utils",
+      "lines": 75,
+      "classes": [],
+      "functions": [
+        "get_logger"
+      ]
+    },
+    {
+      "id": "src/demo/utils/paths.py",
+      "type": "file",
+      "parent": "src/demo/utils",
+      "lines": 50,
+      "classes": [],
+      "functions": [
+        "resolve"
+      ]
+    },
+    {
+      "id": "src/demo/utils/json.py",
+      "type": "file",
+      "parent": "src/demo/utils",
+      "lines": 65,
+      "classes": [
+        "Encoder"
+      ],
+      "functions": [
+        "dumps"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "src/demo/app.py",
+      "target": "src/demo/config.py"
+    },
+    {
+      "source": "src/demo/app.py",
+      "target": "src/demo/core/engine.py"
+    },
+    {
+      "source": "src/demo/app.py",
+      "target": "src/demo/web/routes.py"
+    },
+    {
+      "source": "src/demo/app.py",
+      "target": "src/demo/utils/logging.py"
+    },
+    {
+      "source": "src/demo/app.py",
+      "target": "src/demo/core/db.py"
+    },
+    {
+      "source": "src/demo/cli.py",
+      "target": "src/demo/app.py"
+    },
+    {
+      "source": "src/demo/cli.py",
+      "target": "src/demo/config.py"
+    },
+    {
+      "source": "src/demo/cli.py",
+      "target": "src/demo/utils/logging.py"
+    },
+    {
+      "source": "src/demo/core/engine.py",
+      "target": "src/demo/core/scheduler.py"
+    },
+    {
+      "source": "src/demo/core/engine.py",
+      "target": "src/demo/core/models.py"
+    },
+    {
+      "source": "src/demo/core/engine.py",
+      "target": "src/demo/core/signals.py"
+    },
+    {
+      "source": "src/demo/core/engine.py",
+      "target": "src/demo/utils/logging.py"
+    },
+    {
+      "source": "src/demo/core/scheduler.py",
+      "target": "src/demo/core/models.py"
+    },
+    {
+      "source": "src/demo/core/scheduler.py",
+      "target": "src/demo/utils/helpers.py"
+    },
+    {
+      "source": "src/demo/core/models.py",
+      "target": "src/demo/core/db.py"
+    },
+    {
+      "source": "src/demo/core/db.py",
+      "target": "src/demo/config.py"
+    },
+    {
+      "source": "src/demo/core/db.py",
+      "target": "src/demo/utils/paths.py"
+    },
+    {
+      "source": "src/demo/web/routes.py",
+      "target": "src/demo/web/views.py"
+    },
+    {
+      "source": "src/demo/web/routes.py",
+      "target": "src/demo/web/forms.py"
+    },
+    {
+      "source": "src/demo/web/routes.py",
+      "target": "src/demo/core/models.py"
+    },
+    {
+      "source": "src/demo/web/views.py",
+      "target": "src/demo/web/templating.py"
+    },
+    {
+      "source": "src/demo/web/views.py",
+      "target": "src/demo/core/models.py"
+    },
+    {
+      "source": "src/demo/web/views.py",
+      "target": "src/demo/utils/json.py"
+    },
+    {
+      "source": "src/demo/web/forms.py",
+      "target": "src/demo/core/models.py"
+    },
+    {
+      "source": "src/demo/web/templating.py",
+      "target": "src/demo/utils/paths.py"
+    },
+    {
+      "source": "src/demo/web/templating.py",
+      "target": "src/demo/utils/helpers.py"
+    },
+    {
+      "source": "src/demo/config.py",
+      "target": "src/demo/utils/paths.py"
+    },
+    {
+      "source": "src/demo/utils/json.py",
+      "target": "src/demo/utils/helpers.py"
+    },
+    {
+      "source": "src/demo/core/signals.py",
+      "target": "src/demo/utils/logging.py"
+    },
+    {
+      "source": "src/demo/web/routes.py",
+      "target": "src/demo/core/signals.py"
+    }
+  ]
+}
