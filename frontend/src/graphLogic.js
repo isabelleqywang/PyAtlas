@@ -1,6 +1,6 @@
-// 折叠/展开的核心逻辑：纯函数，不依赖 React 或 Cytoscape，方便测试和讲解。
+// Core collapse/expand logic: pure functions, no React or Cytoscape, easy to test and explain.
 
-// 返回 id 的所有祖先，顺序从最顶层到直接父级
+// All ancestors of `id`, ordered from the top-level folder down to the direct parent
 function ancestorsOf(id, parentOf) {
   const chain = []
   for (let p = parentOf.get(id); p; p = parentOf.get(p)) chain.unshift(p)
@@ -11,7 +11,7 @@ export function buildParentMap(nodes) {
   return new Map(nodes.map((n) => [n.id, n.parent ?? null]))
 }
 
-// 默认只展开最顶层（没有 parent 的文件夹）
+// By default only the top level (folders without a parent) is expanded
 export function defaultExpanded(nodes) {
   return new Set(nodes.filter((n) => n.type === 'folder' && !n.parent).map((n) => n.id))
 }
@@ -20,8 +20,8 @@ export function allFolders(nodes) {
   return new Set(nodes.filter((n) => n.type === 'folder').map((n) => n.id))
 }
 
-// 节点"代表谁"：从最顶层祖先往下找，遇到第一个被折叠的文件夹就由它代表；
-// 找不到说明自己可见，代表自己
+// Who stands in for a node on screen: walk down from the top-level ancestor, and the first
+// collapsed folder represents it. If there is none, the node is visible and represents itself.
 export function representative(id, parentOf, expanded) {
   for (const a of ancestorsOf(id, parentOf)) {
     if (!expanded.has(a)) return a
@@ -29,14 +29,15 @@ export function representative(id, parentOf, expanded) {
   return id
 }
 
-// 当前应该显示哪些节点：所有祖先都展开的节点
+// Which nodes should be visible: those whose ancestors are all expanded
 export function visibleNodes(nodes, expanded) {
   const parentOf = buildParentMap(nodes)
   return nodes.filter((n) => representative(n.id, parentOf, expanded) === n.id)
 }
 
-// 边聚合：把每条边的两端换成各自的"代表"，丢掉两端相同的边（折叠到同一个文件夹内部），
-// 同一对 (source, target) 的多条边合并成一条，count 记录合并了几条
+// Edge aggregation: replace both ends of every edge with its representative, drop edges whose
+// ends are the same (hidden inside one collapsed folder), and merge parallel edges between the
+// same (source, target) pair into one, with `count` recording how many were merged.
 export function aggregateEdges(edges, nodes, expanded) {
   const parentOf = buildParentMap(nodes)
   const merged = new Map()

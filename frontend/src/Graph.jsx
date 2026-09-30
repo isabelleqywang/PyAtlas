@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import cytoscape from 'cytoscape'
+import dagre from 'cytoscape-dagre'
 import mock from './mock.json'
-import { aggregateEdges, allFolders, defaultExpanded, visibleNodes } from './graphLogic.js'
+import { aggregateEdges, defaultExpanded, visibleNodes } from './graphLogic.js'
+
+cytoscape.use(dagre)
 
 const style = [
   {
@@ -62,14 +65,38 @@ const style = [
   },
 ]
 
+const LAYOUT = {
+  name: 'dagre',
+  rankDir: 'TB',
+  nodeSep: 28,
+  rankSep: 48,
+  padding: 40,
+  nodeDimensionsIncludeLabels: true,
+}
+const ANIMATION_MS = 400
+
+// Walk up the parent chain until we find an ancestor that was on screen before the update
+function findPrevPosition(id, parentOf, prevPos) {
+  for (let p = parentOf.get(id); p; p = parentOf.get(p)) {
+    if (prevPos.has(p)) return prevPos.get(p)
+  }
+  return null
+}
+
 export default function Graph() {
   const containerRef = useRef(null)
   const cyRef = useRef(null)
+  const firstRun = useRef(true)
   const [expanded, setExpanded] = useState(() => defaultExpanded(mock.nodes))
 
-  // 只创建一次 Cytoscape 实例
+  // Create the Cytoscape instance once
   useEffect(() => {
-    const cy = cytoscape({ container: containerRef.current, style, maxZoom: 1.5 })
+    const cy = cytoscape({
+      container: containerRef.current,
+      style,
+      minZoom: 0.2,
+      maxZoom: 1.5,
+    })
     cy.on('tap', 'node[type = "folder"]', (evt) => {
       const id = evt.target.id()
       setExpanded((prev) => {
@@ -80,39 +107,68 @@ export default function Graph() {
       })
     })
     cyRef.current = cy
+    if (import.meta.env.DEV) window.__cy = cy
     return () => cy.destroy()
   }, [])
 
-  // expanded 变化后重新计算可见节点和聚合边，并重新布局
+  // When `expanded` changes: diff the visible nodes and aggregated edges against
+  // what is on screen, so untouched nodes keep their place and animate to the new layout
   useEffect(() => {
     const cy = cyRef.current
-    const nodes = visibleNodes(mock.nodes, expanded).map((n) => ({
-      data: {
-        id: n.id,
-        label: n.id.split('/').pop(),
-        type: n.type,
-        parent: n.parent ?? undefined,
-        depth: n.id.split('/').length,
-        collapsed: n.type === 'folder' && !expanded.has(n.id),
-      },
-    }))
+    const parentOf = new Map(mock.nodes.map((n) => [n.id, n.parent ?? null]))
+    const prevPos = new Map(cy.nodes().map((n) => [n.id(), { ...n.position() }]))
+
+    const nodes = visibleNodes(mock.nodes, expanded)
     const edges = aggregateEdges(mock.edges, mock.nodes, expanded).map((e) => ({
-      data: { id: `${e.source}->${e.target}`, ...e },
+      ...e,
+      id: `${e.source}->${e.target}`,
     }))
+    const nodeIds = new Set(nodes.map((n) => n.id))
+    const edgeIds = new Set(edges.map((e) => e.id))
+
     cy.batch(() => {
-      cy.elements().remove()
-      cy.add([...nodes, ...edges])
+      cy.edges().filter((e) => !edgeIds.has(e.id())).remove()
+      cy.nodes().filter((n) => !nodeIds.has(n.id())).remove()
+
+      // Parents first, so children can attach to them
+      const sorted = [...nodes].sort((a, b) => a.id.split('/').length - b.id.split('/').length)
+      for (const n of sorted) {
+        const data = {
+          label: n.id.split('/').pop(),
+          type: n.type,
+          depth: n.id.split('/').length,
+          collapsed: n.type === 'folder' && !expanded.has(n.id),
+        }
+        const existing = cy.getElementById(n.id)
+        if (existing.nonempty()) {
+          existing.data(data)
+          // A folder that just collapsed is a plain node again: keep it where its box was
+          if (data.collapsed && prevPos.has(n.id)) existing.position(prevPos.get(n.id))
+        } else {
+          const origin = findPrevPosition(n.id, parentOf, prevPos)
+          cy.add({
+            data: { id: n.id, parent: n.parent ?? undefined, ...data },
+            ...(origin && { position: { ...origin } }),
+          })
+        }
+      }
+      for (const e of edges) {
+        const existing = cy.getElementById(e.id)
+        if (existing.nonempty()) existing.data('count', e.count)
+        else cy.add({ data: e })
+      }
     })
-    cy.layout({ name: 'cose', animate: false, nodeDimensionsIncludeLabels: true }).run()
+
+    const animate = !firstRun.current
+    firstRun.current = false
+    cy.layout({
+      ...LAYOUT,
+      fit: true,
+      animate,
+      animationDuration: ANIMATION_MS,
+      animationEasing: 'ease-in-out',
+    }).run()
   }, [expanded])
 
-  return (
-    <div className="graph-wrap">
-      <div ref={containerRef} className="graph" />
-      <div className="graph-toolbar">
-        <button onClick={() => setExpanded(allFolders(mock.nodes))}>全部展开</button>
-        <button onClick={() => setExpanded(new Set())}>全部折叠</button>
-      </div>
-    </div>
-  )
+  return <div ref={containerRef} className="graph" />
 }

@@ -9,7 +9,7 @@ export default function App() {
         <main className="graph-pane">
           <Graph />
         </main>
-        <aside className="detail-pane">详情</aside>
+        <aside className="detail-pane">Details</aside>
       </div>
     </div>
   )
